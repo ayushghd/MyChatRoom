@@ -3,12 +3,14 @@ package chat_server;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class server_frame extends javax.swing.JFrame 
 {
    ArrayList clientOutputStreams;
    ArrayList<String> users;
-
+   ServerSocket serversocket;  
    public class ClientHandler implements Runnable	
    {
        BufferedReader reader;
@@ -154,7 +156,7 @@ public class server_frame extends javax.swing.JFrame
     }
 
     @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -252,9 +254,9 @@ public class server_frame extends javax.swing.JFrame
         );
 
         pack();
-    }// </editor-fold>//GEN-END:initComponents
+    }// </editor-fold>                        
 
-    private void b_endActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_endActionPerformed
+    private void b_endActionPerformed(java.awt.event.ActionEvent evt) {                                      
         try 
         {
             Thread.sleep(2000);                 //5000 milliseconds is five second.
@@ -264,17 +266,33 @@ public class server_frame extends javax.swing.JFrame
         tellEveryone("Server:is stopping and all users will be disconnected.\n:Chat");
         ta_chat.append("Server stopping... \n");
         
+        tf_pwd.setEditable(true);
         ta_chat.setText("");
-    }//GEN-LAST:event_b_endActionPerformed
+       try {
+           
+           clientOutputStreams.clear();
+           users.clear();
+           serversocket.close();
+           System.out.println(clientOutputStreams.size());
+           b_end.setEnabled(false);
+           b_start.setEnabled(true);
+           
+       } catch (IOException ex) {
+                System.out.println("lllll");
+               }
+    }                                     
 
-    private void b_startActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_startActionPerformed
+    private void b_startActionPerformed(java.awt.event.ActionEvent evt) {                                        
         Thread starter = new Thread(new ServerStart());
         starter.start();
         tf_pwd.setEditable(false);
         ta_chat.append("Server started...\n");
-    }//GEN-LAST:event_b_startActionPerformed
+        b_start.setEnabled(false);
+        b_end.setEnabled(true);
+        
+    }                                       
 
-    private void b_usersActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_usersActionPerformed
+    private void b_usersActionPerformed(java.awt.event.ActionEvent evt) {                                        
         ta_chat.append("\n Online users : \n");
         for (String current_user : users)
         {
@@ -282,15 +300,15 @@ public class server_frame extends javax.swing.JFrame
             ta_chat.append("\n");
         }    
         
-    }//GEN-LAST:event_b_usersActionPerformed
+    }                                       
 
-    private void b_clearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_clearActionPerformed
+    private void b_clearActionPerformed(java.awt.event.ActionEvent evt) {                                        
         ta_chat.setText("");
-    }//GEN-LAST:event_b_clearActionPerformed
+    }                                       
 
-    private void set_password(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_set_password
+    private void set_password(java.awt.event.ActionEvent evt) {                              
         // TODO add your handling code here:
-    }//GEN-LAST:event_set_password
+    }                             
 
     public static void main(String args[]) 
     {
@@ -310,14 +328,13 @@ public class server_frame extends javax.swing.JFrame
         {
             clientOutputStreams = new ArrayList();
             users = new ArrayList();  
-
             try 
             {
-                ServerSocket serverSock = new ServerSocket(2222);
+                serversocket = new ServerSocket(2222);
 
                 while (true) 
                 {
-                            Socket clientSock = serverSock.accept();
+                            Socket clientSock = serversocket.accept();
                             DataOutputStream dout=new DataOutputStream(clientSock.getOutputStream());
                             DataInputStream din = new DataInputStream(clientSock.getInputStream());
                             String s = din.readUTF();
@@ -383,19 +400,20 @@ public class server_frame extends javax.swing.JFrame
         {
             try 
             {
-               DataOutputStream writer = (DataOutputStream) it.next();
+                DataOutputStream writer = (DataOutputStream) it.next();
                 writer.writeUTF(message);
                 writer.flush();
                 ta_chat.setCaretPosition(ta_chat.getDocument().getLength());
             } 
             catch (Exception ex) 
             {
+                System.out.println("inside");
 		ta_chat.append("Error telling everyone. \n");
             }
         } 
     }
     
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+    // Variables declaration - do not modify                     
     private javax.swing.JButton b_clear;
     private javax.swing.JButton b_end;
     private javax.swing.JButton b_start;
@@ -404,5 +422,5 @@ public class server_frame extends javax.swing.JFrame
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea ta_chat;
     private javax.swing.JTextField tf_pwd;
-    // End of variables declaration//GEN-END:variables
+    // End of variables declaration                   
 }
