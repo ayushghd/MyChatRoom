@@ -85,11 +85,18 @@ public class client_frame extends javax.swing.JFrame
                 while ((stream = din.readUTF()) != null) 
                 {
                      data = stream.split(":");
-
+                       
                      if (data[2].equals(chat)) 
                      {
-                        ta_chat.append(data[0] + ": " + data[1] + "\n");
-                        ta_chat.setCaretPosition(ta_chat.getDocument().getLength());
+                         if(stream.contains("is stopping"))
+                         {
+                             isConnected=false;
+                             tf_username.setEditable(true);
+                             tf_password.setEditable(true);
+                             sock.close();
+                         }
+                         ta_chat.append(data[0] + ": " + data[1] + "\n");
+                         ta_chat.setCaretPosition(ta_chat.getDocument().getLength());
                      } 
                      else if (data[2].equals(connect))
                      {
@@ -140,7 +147,7 @@ public class client_frame extends javax.swing.JFrame
     //--------------------------//
     
     @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
     private void initComponents() {
 
         lb_address = new javax.swing.JLabel();
@@ -294,21 +301,21 @@ public class client_frame extends javax.swing.JFrame
         lb_password.getAccessibleContext().setAccessibleName("Server Password : ");
 
         pack();
-    }// </editor-fold>//GEN-END:initComponents
+    }// </editor-fold>                        
 
-    private void tf_addressActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tf_addressActionPerformed
+    private void tf_addressActionPerformed(java.awt.event.ActionEvent evt) {                                           
        
-    }//GEN-LAST:event_tf_addressActionPerformed
+    }                                          
 
-    private void tf_portActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tf_portActionPerformed
+    private void tf_portActionPerformed(java.awt.event.ActionEvent evt) {                                        
    
-    }//GEN-LAST:event_tf_portActionPerformed
+    }                                       
 
-    private void tf_usernameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tf_usernameActionPerformed
+    private void tf_usernameActionPerformed(java.awt.event.ActionEvent evt) {                                            
     
-    }//GEN-LAST:event_tf_usernameActionPerformed
+    }                                           
 
-    private void b_connectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_connectActionPerformed
+    private void b_connectActionPerformed(java.awt.event.ActionEvent evt) {                                          
         if (isConnected == false) 
         {
             username = tf_username.getText();
@@ -326,13 +333,17 @@ public class client_frame extends javax.swing.JFrame
                 dout.flush();
                 dout.writeUTF(username + ":has connected.:Connect");
                 dout.flush(); 
-                if(din.readUTF()!="Password not matched")
+                String s="Password not matched";
+                if(!din.readUTF().equals(s))
                 {
                     isConnected = true;
+                    ListenThread();
                 }
                 else
                 {
+                    ta_chat.append("Password not matched!\n");
                     tf_username.setEditable(true);
+                    sock.close();
                 }
                 
             } 
@@ -342,19 +353,18 @@ public class client_frame extends javax.swing.JFrame
                 tf_username.setEditable(true);
             }
             
-                    ListenThread();
         } else if (isConnected == true) 
         {
             ta_chat.append("You are already connected. \n");
         }
-    }//GEN-LAST:event_b_connectActionPerformed
+    }                                         
 
-    private void b_disconnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_disconnectActionPerformed
+    private void b_disconnectActionPerformed(java.awt.event.ActionEvent evt) {                                             
         sendDisconnect();
         Disconnect();
-    }//GEN-LAST:event_b_disconnectActionPerformed
+    }                                            
 
-    private void b_sendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_sendActionPerformed
+    private void b_sendActionPerformed(java.awt.event.ActionEvent evt) {                                       
         String nothing = "";
         if ((tf_chat.getText()).equals(nothing)) {
             tf_chat.setText("");
@@ -372,9 +382,9 @@ public class client_frame extends javax.swing.JFrame
 
         tf_chat.setText("");
         tf_chat.requestFocus();
-    }//GEN-LAST:event_b_sendActionPerformed
+    }                                      
 
-    private void b_fileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_fileActionPerformed
+    private void b_fileActionPerformed(java.awt.event.ActionEvent evt) {                                       
         String nothing = "";
         if ((tf_chat.getText()).equals(nothing)) {
             tf_chat.setText("");
@@ -416,7 +426,7 @@ public class client_frame extends javax.swing.JFrame
             tf_chat.setText("");
             tf_chat.requestFocus();
         }
-    }//GEN-LAST:event_b_fileActionPerformed
+    }                                      
 
     public static void main(String args[]) 
     {
@@ -430,7 +440,7 @@ public class client_frame extends javax.swing.JFrame
         });
     }
     
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+    // Variables declaration - do not modify                     
     private javax.swing.JButton b_connect;
     private javax.swing.JButton b_disconnect;
     private javax.swing.JButton b_send;
@@ -446,5 +456,5 @@ public class client_frame extends javax.swing.JFrame
     private javax.swing.JTextField tf_password;
     private javax.swing.JTextField tf_port;
     private javax.swing.JTextField tf_username;
-    // End of variables declaration//GEN-END:variables
+    // End of variables declaration                   
 }
